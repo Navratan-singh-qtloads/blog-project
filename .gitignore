@@ -1,0 +1,6 @@
+frontend/node_modules
+frontend/.env
+frontend/.next
+fastapi-backend/.env
+fastapi-backend/venv
+fastapi-backend/.dockerignore
