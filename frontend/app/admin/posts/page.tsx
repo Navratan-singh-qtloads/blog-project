@@ -391,13 +391,13 @@ export default function PostPage() {
                         <span
                           className={`px-3 py-1 rounded text-white text-sm ${
                             post.status ===
-                            "active"
+                            "published"
                               ? "bg-green-500"
                               : "bg-red-500"
                           }`}
                         >
                           {post.status ||
-                            "inactive"}
+                            "draft"}
                         </span>
 
                       </td>

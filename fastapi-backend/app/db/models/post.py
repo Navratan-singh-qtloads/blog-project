@@ -42,7 +42,7 @@ class Post(Base):
 
     status = Column(
         String,
-        default="Active"
+        default="draft"
     )
 
     # ================= USER =================

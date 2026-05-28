@@ -34,7 +34,7 @@ async function getPosts(): Promise<Post[]> {
     // =========================
     const activePosts = data.filter(
       (post: Post) =>
-        post.status?.toLowerCase() === "active"
+        post.status?.toLowerCase() === "published"
     );
 
     // =========================
@@ -113,7 +113,7 @@ export default async function HomePage() {
           <div className="bg-white rounded-2xl p-10 text-center shadow-sm">
 
             <h3 className="text-2xl font-semibold mb-3">
-              No Active Posts Found
+              No published Posts Found
             </h3>
 
             <p className="text-gray-500">

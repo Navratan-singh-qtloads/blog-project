@@ -49,7 +49,7 @@ export default function CreatePost() {
 
   // STATUS
   const [status, setStatus] =
-    useState("active");
+    useState("published");
 
   const [categories, setCategories] =
     useState<any[]>([]);
@@ -155,7 +155,7 @@ export default function CreatePost() {
 
       // STATUS
       setStatus(
-        post.status || "active"
+        post.status || "published"
       );
 
       // IMAGE PREVIEW
@@ -436,12 +436,12 @@ export default function CreatePost() {
             }
           >
 
-            <option value="active">
-              Active
+            <option value="published">
+              Published
             </option>
 
-            <option value="inactive">
-              Inactive
+            <option value="draft">
+              Draft
             </option>
 
           </select>
