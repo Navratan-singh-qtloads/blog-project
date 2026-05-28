@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import Link from "next/link";
 
@@ -38,6 +42,14 @@ export default function PostPage() {
   const [error, setError] =
     useState<string>("");
 
+  // ================= SEARCH =================
+  const [search, setSearch] =
+    useState("");
+
+  // ================= SORTING =================
+  const [sortOrder, setSortOrder] =
+    useState("asc");
+
   // ================= PAGINATION =================
   const [currentPage, setCurrentPage] =
     useState(1);
@@ -58,18 +70,10 @@ export default function PostPage() {
       const response =
         await api.get("/posts");
 
-      // BACKEND ARRAY
       const data =
         response.data || [];
 
-      // ASCENDING ORDER
-      const sortedData =
-        data.sort(
-          (a: Post, b: Post) =>
-            a.id - b.id
-        );
-
-      setPosts(sortedData);
+      setPosts(data);
 
     } catch (err) {
 
@@ -137,12 +141,74 @@ export default function PostPage() {
     }
   }
 
+  // ================= SEARCH + SORT =================
+  const filteredPosts =
+    useMemo(() => {
+
+      let filtered = [
+        ...posts,
+      ];
+
+      // SEARCH
+      filtered =
+        filtered.filter(
+          (post) =>
+            post.title
+              .toLowerCase()
+              .includes(
+                search.toLowerCase()
+              )
+        );
+
+      // SORT BY ID
+      filtered.sort(
+        (a, b) => {
+
+          if (
+            sortOrder ===
+            "asc"
+          ) {
+
+            return (
+              a.id - b.id
+            );
+
+          } else {
+
+            return (
+              b.id - a.id
+            );
+
+          }
+        }
+      );
+
+      return filtered;
+
+    }, [
+      posts,
+      search,
+      sortOrder,
+    ]);
+
+  // ================= RESET PAGE =================
+  useEffect(() => {
+
+    setCurrentPage(1);
+
+  }, [
+    search,
+    sortOrder,
+  ]);
+
   // ================= PAGINATION LOGIC =================
 
   // TOTAL PAGES
-  const totalPages = Math.ceil(
-    posts.length / itemsPerPage
-  );
+  const totalPages =
+    Math.ceil(
+      filteredPosts.length /
+        itemsPerPage
+    );
 
   // START INDEX
   const startIndex =
@@ -156,7 +222,7 @@ export default function PostPage() {
 
   // CURRENT PAGE DATA
   const currentPosts =
-    posts.slice(
+    filteredPosts.slice(
       startIndex,
       endIndex
     );
@@ -180,6 +246,45 @@ export default function PostPage() {
           >
             + Create Post
           </Link>
+
+        </div>
+
+        {/* SEARCH + SORT */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+          {/* SEARCH */}
+          <input
+            type="text"
+            placeholder="Search post..."
+            value={search}
+            onChange={(e) =>
+              setSearch(
+                e.target.value
+              )
+            }
+            className="border border-gray-300 rounded-lg px-4 py-3 w-full"
+          />
+
+          {/* SORT */}
+          <select
+            value={sortOrder}
+            onChange={(e) =>
+              setSortOrder(
+                e.target.value
+              )
+            }
+            className="border border-gray-300 rounded-lg px-4 py-3"
+          >
+
+            <option value="asc">
+              ID Ascending
+            </option>
+
+            <option value="desc">
+              ID Descending
+            </option>
+
+          </select>
 
         </div>
 
@@ -261,17 +366,23 @@ export default function PostPage() {
                   (post) => (
 
                     <tr
-                      key={post.id}
+                      key={
+                        post.id
+                      }
                     >
 
                       {/* ID */}
                       <td className="border p-3">
-                        {post.id}
+                        {
+                          post.id
+                        }
                       </td>
 
                       {/* TITLE */}
                       <td className="border p-3">
-                        {post.title}
+                        {
+                          post.title
+                        }
                       </td>
 
                       {/* STATUS */}

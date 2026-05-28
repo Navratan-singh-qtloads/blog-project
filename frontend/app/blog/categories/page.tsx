@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Link from "next/link";
 
@@ -21,6 +21,14 @@ export default function CategoriesPage() {
   const [categories, setCategories] =
     useState<any[]>([]);
 
+  // ================= SEARCH =================
+  const [search, setSearch] =
+    useState("");
+
+  // ================= SORTING =================
+  const [sortOrder, setSortOrder] =
+    useState("asc");
+
   // ================= PAGINATION =================
   const [currentPage, setCurrentPage] =
     useState(1);
@@ -39,14 +47,7 @@ export default function CategoriesPage() {
       const response =
         await api.get("/categories");
 
-      // ASCENDING ORDER
-      const sortedCategories =
-        response.data.sort(
-          (a: any, b: any) =>
-            a.id - b.id
-        );
-
-      setCategories(sortedCategories);
+      setCategories(response.data);
 
     } catch (error) {
 
@@ -98,11 +99,47 @@ export default function CategoriesPage() {
     }
   }
 
+  // ================= SEARCH + SORT =================
+  const filteredAndSortedCategories =
+    useMemo(() => {
+
+      // SEARCH FILTER
+      const filtered =
+        categories.filter((category) =>
+          category.title
+            .toLowerCase()
+            .includes(
+              search.toLowerCase()
+            )
+        );
+
+      // SORTING
+      const sorted = filtered.sort(
+        (a: any, b: any) => {
+
+          if (sortOrder === "asc") {
+            return a.id - b.id;
+          } else {
+            return b.id - a.id;
+          }
+        }
+      );
+
+      return sorted;
+
+    }, [categories, search, sortOrder]);
+
+  // ================= RESET PAGE =================
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, sortOrder]);
+
   // ================= PAGINATION =================
 
   // TOTAL PAGES
   const totalPages = Math.ceil(
-    categories.length / itemsPerPage
+    filteredAndSortedCategories.length /
+      itemsPerPage
   );
 
   // START INDEX
@@ -115,7 +152,7 @@ export default function CategoriesPage() {
 
   // CURRENT PAGE DATA
   const currentCategories =
-    categories.slice(
+    filteredAndSortedCategories.slice(
       startIndex,
       endIndex
     );
@@ -139,6 +176,39 @@ export default function CategoriesPage() {
           >
             Create Category
           </Link>
+
+        </div>
+
+        {/* SEARCH + SORT */}
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+
+          {/* SEARCH */}
+          <input
+            type="text"
+            placeholder="Search category..."
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            className="border border-gray-300 rounded-lg px-4 py-3 w-full"
+          />
+
+          {/* SORT */}
+          <select
+            value={sortOrder}
+            onChange={(e) =>
+              setSortOrder(e.target.value)
+            }
+            className="border border-gray-300 rounded-lg px-4 py-3"
+          >
+            <option value="asc">
+              ID Ascending
+            </option>
+
+            <option value="desc">
+              ID Descending
+            </option>
+          </select>
 
         </div>
 

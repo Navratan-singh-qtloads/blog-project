@@ -80,11 +80,8 @@ export default async function BlogDetailsPage({
         {/* IMAGE */}
         {post.image && (
 
-         <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}/${post.image
-              ?.replace(/\\/g, "/")
-              .replace(/^\/+/, "")
-              .trim()}`}
+          <img
+            src={`${process.env.NEXT_PUBLIC_API_URL}/${post.image.replace("\\", "/")}`}
             alt={post.title}
             className="w-full h-[400px] object-cover"
           />
